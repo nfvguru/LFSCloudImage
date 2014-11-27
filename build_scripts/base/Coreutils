@@ -1,0 +1,37 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=coreutils-8.21
+tar -Jxf ${basename}.tar.xz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+
+#Configure
+./configure --prefix=/tools --enable-install-program=hostname	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make RUN_EXPENSIVE_TESTS=yes check
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

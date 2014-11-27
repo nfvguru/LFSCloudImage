@@ -1,0 +1,31 @@
+#!/bin/sh
+Tool=$2
+List=$1
+touch $List
+echo "$0:  $Tool >>>> $List"
+ists=`grep -c "$Tool" $List`
+if [ $ists -ne 0 ]; then
+ echo "Tool already exits ..."
+ exit 0
+fi
+#echo "echo \"$Tool\" >> $List"
+echo "$Tool" >> $List
+for libs in `ldd $Tool 2>/dev/null`; do
+   tocopy=`echo $libs | grep -c "/lib"`
+   if [ $tocopy -ne 0 ]; then
+	#echo $libs
+	if [ \! -f $libs ]; then
+	   echo "$libs not exits in system"
+	   continue;
+        fi
+	isls=`grep -c "$libs" $List`
+	if [ $isls -ne 0 ]; then
+	  echo "Lib already exits"
+	  continue;
+	fi
+	echo "$libs" >> $List
+	libpath=`dirname $libs`
+	liblink=`ls -l $libs | awk -F" " '{print $NF}'`
+	echo "$libpath/$liblink" >> $List
+   fi
+done

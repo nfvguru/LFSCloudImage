@@ -1,0 +1,7 @@
+#!/bin/sh
+
+rm -Rvf initrd.img
+cd mytempfs
+find . | cpio -o -H newc | gzip > ../initrd.img
+cd -
+

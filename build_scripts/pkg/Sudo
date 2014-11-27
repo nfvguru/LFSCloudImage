@@ -1,0 +1,69 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=sudo-1.8.7
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Core things
+
+#Configure
+./configure --prefix=/usr                      \
+            --libexecdir=/usr/lib/sudo         \
+            --docdir=/usr/share/doc/sudo-1.8.7 \
+            --with-timedir=/var/lib/sudo       \
+            --with-all-insults                 \
+            --with-env-editor                  	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+cat > /etc/sudoers << "EOF"
+# User alias specification
+User_Alias  ADMIN = ubuntu
+
+# Allow people in group ADMIN to run all commands without a password
+root        ALL = NOPASSWD: ALL
+ADMIN       ALL = NOPASSWD: ALL
+EOF
+
+cat > /etc/pam.d/sudo << "EOF"
+# Begin /etc/pam.d/sudo
+
+# include the default auth settings
+auth      include     system-auth
+
+# include the default account settings
+account   include     system-account
+
+# Set default environment variables for the service user
+session   required    pam_env.so
+
+# include system session defaults
+session   include     system-session
+
+# End /etc/pam.d/sudo
+EOF
+chmod 644 /etc/pam.d/sudo
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

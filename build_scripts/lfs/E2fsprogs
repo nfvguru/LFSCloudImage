@@ -1,0 +1,54 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=e2fsprogs-1.42.7
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Core things
+
+mkdir -v build
+cd build
+
+#Configure
+../configure --prefix=/usr         \
+             --with-root-prefix="" \
+             --enable-elf-shlibs   \
+             --disable-libblkid    \
+             --disable-libuuid     \
+             --disable-uuidd       \
+             --disable-fsck	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+make install-libs  2>&1 >> ${DFILE}
+chmod -v u+w /usr/lib/{libcom_err,libe2p,libext2fs,libss}.a 2>&1 >> ${DFILE}
+gunzip -v /usr/share/info/libext2fs.info.gz 2>&1 >> ${DFILE}
+install-info --dir-file=/usr/share/info/dir /usr/share/info/libext2fs.info 
+
+makeinfo -o      doc/com_err.info ../lib/et/com_err.texinfo
+install -v -m644 doc/com_err.info /usr/share/info 2>&1 >> ${DFILE}
+install-info --dir-file=/usr/share/info/dir /usr/share/info/com_err.info 
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

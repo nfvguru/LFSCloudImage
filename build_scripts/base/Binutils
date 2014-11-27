@@ -1,0 +1,46 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -jxf binutils-2.23.1.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar binutils-2.23.1.tar.bz2"
+cd binutils-2.23.1
+##### Code things
+mkdir -v ../binutils-build 2>&1 >> ${DFILE}
+cd ../binutils-build
+
+#Configure
+../binutils-2.23.1/configure     \
+    --prefix=/tools            \
+    --with-sysroot=$LFS        \
+    --with-lib-path=/tools/lib \
+    --target=$LFS_TGT          \
+    --disable-nls              \
+    --disable-werror	2>&1 >> ${DFILE}
+
+errorMsg $? "Failed to Configure binutils-2.23.1"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make binutils-2.23.1"
+
+case $(uname -m) in
+  x86_64) mkdir -v /tools/lib && ln -sv lib /tools/lib64 ;;
+esac
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install binutils-2.23.1"
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf binutils-build 2>&1 >> ${DFILE}
+rm -Rf binutils-2.23.1 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

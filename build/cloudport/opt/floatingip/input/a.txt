@@ -1,0 +1,1 @@
+{"version":"1.0","name":"at","family":"remote-access","pkgurl":"http://10.1.10.145/vpnrac-0.0.1.deb"}

@@ -1,0 +1,27 @@
+#!/bin/sh 
+Root=`pwd`
+copyFile=.copyFile
+missFile=.missFile
+copyroot=/mnt/lfs
+rm -Rf mytempfs/*
+rm -f ${copyFile}
+rm -f ${missFile}
+
+for file in `find system`; do
+	barename=`echo $file | awk -F"system/" '{print $NF}'`
+	#echo "Need to copy File >>$barename<<"
+	if [ -d system/${barename} ]; then
+	   #echo "$barename is a directory"
+	   mkdir -pv mytempfs/$barename 2>&1 >> ${copyFile}
+	fi
+
+	if [ -f ${copyroot}/$barename ]; then
+		echo "File exists in LFS too" 2>&1 >> ${copyFile}
+		tdir=`dirname $barename`
+		mkdir -pv mytempfs/${tdir} 2>&1 >> ${copyFile}
+		cp -dpRvf ${copyroot}/${barename} mytempfs/${barename} 2>&1 >> ${copyFile}
+	else 
+		echo "$barename: File Missed in LFS " 2>&1 >> ${missFile}
+	fi
+
+done

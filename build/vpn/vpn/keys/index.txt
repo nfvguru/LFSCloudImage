@@ -1,0 +1,4 @@
+V	240628080258Z		01	unknown	/C=IN/ST=TN/L=Chennai/O=Calsoftlabs/OU=NFVO/CN=server/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+V	240628080343Z		02	unknown	/C=IN/ST=TN/L=Chennai/O=Calsoftlabs/OU=NFVO/CN=client1/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+V	240628080410Z		03	unknown	/C=IN/ST=TN/L=Chennai/O=Calsoftlabs/OU=NFVO/CN=client2/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+V	240628080440Z		04	unknown	/C=IN/ST=TN/L=Chennai/O=Calsoftlabs/OU=NFVO/CN=client3/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com

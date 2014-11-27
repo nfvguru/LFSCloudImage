@@ -1,0 +1,39 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=groff-1.22.2
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Core things
+
+#Configure
+PAGE=A4 ./configure --prefix=/usr 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+mkdir -p /usr/share/doc/groff-1.22/pdf
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+ln -sv eqn /usr/bin/geqn 2>&1 >> ${DFILE}
+ln -sv tbl /usr/bin/gtbl 2>&1 >> ${DFILE}
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

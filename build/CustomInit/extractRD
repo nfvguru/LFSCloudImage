@@ -1,0 +1,3 @@
+#!/bin/sh
+RD=$1
+zcat $RD | cpio -i

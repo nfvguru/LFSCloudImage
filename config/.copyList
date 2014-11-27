@@ -1,0 +1,16 @@
+/usr/bin/perl
+/usr/lib/perl5/5.16.2/i686-linux/CORE/libperl.so
+/lib/libnsl.so.1
+/lib/libnsl-2.17.so
+/lib/libdl.so.2
+/lib/libdl-2.17.so
+/lib/libm.so.6
+/lib/libm-2.17.so
+/lib/libcrypt.so.1
+/lib/libcrypt-2.17.so
+/lib/libutil.so.1
+/lib/libutil-2.17.so
+/lib/libc.so.6
+/lib/libc-2.17.so
+/lib/ld-linux.so.2
+/lib/ld-2.17.so

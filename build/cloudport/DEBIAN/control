@@ -1,0 +1,8 @@
+Package: cloudport5.4
+Priority: optional
+Section: devel
+Installed-Size: 100
+Version: 5.4
+Architecture: i386
+Description: CloudPort for dynamic service provision, Remediation and ContainerInfo of VPN, Loadbalancer, SSL-offloading, RemediationInfo, openvpnclient, cloud-vmon, spwancp changes
+Maintainer: CalsoftLabs

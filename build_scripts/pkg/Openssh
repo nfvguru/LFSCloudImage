@@ -1,0 +1,63 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=openssh-6.3p1
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Core things
+
+install -v -m700 -d /var/lib/sshd &&
+chown   -v root:sys /var/lib/sshd &&
+groupadd -g 50 sshd &&
+useradd -c 'sshd PrivSep' -d /var/lib/sshd -g sshd -s /bin/false -u 50 sshd
+
+#Configure
+./configure --prefix=/usr                     \
+            --libexecdir=/usr/lib/openssh     \
+            --sysconfdir=/etc/ssh             \
+            --datadir=/usr/share/sshd         \
+            --with-md5-passwords              \
+            --with-privsep-path=/var/lib/sshd	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+install -v -m755 contrib/ssh-copy-id /usr/bin
+
+sed 's@d/login@d/sshd@g' /etc/pam.d/login > /etc/pam.d/sshd &&
+chmod 644 /etc/pam.d/sshd &&
+#echo "UsePAM yes" >> /etc/ssh/sshd_config
+
+tar jxpf ../blfs-bootscripts-20130908.tar.bz2
+cd blfs-bootscripts-20130908
+make install-sshd
+
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+#Fix for SSHD not stating issue
+useradd sshd
+cd /
+patch -p1 < ${SDir}/sshd.patch 2>&1 >> ${DFILE}
+cd ${SDir}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

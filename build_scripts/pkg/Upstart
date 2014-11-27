@@ -1,0 +1,46 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=upstart_1.5.orig
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd upstart-1.5
+##### Core things
+
+#Configure
+./configure --prefix=/	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+
+mkdir targetX
+DDIR=${SDir}/upstart-1.5/targetX
+
+make DESTDIR=${DDIR} install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+tar cfz /build/targetX.tar.gz targetX
+
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+
+#add the upstart configs
+tar xvfz upstart.tar.gz
+
+#remove folder(s)
+rm -Rf  upstart-1.5 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

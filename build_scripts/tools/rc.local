@@ -1,0 +1,7 @@
+#!/bin/sh -e
+
+/etc/getCert.sh &
+
+echo 1 > /root/lava
+
+exit 0

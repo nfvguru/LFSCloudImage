@@ -1,0 +1,13 @@
+sh build_scripts/tools/fstab
+logout
+chroot.post
+/tools/bin/find /{,usr/}{bin,lib,sbin} -type f \
+  -exec /tools/bin/strip --strip-debug '{}' ';'
+logout
+chroot
+make kernel
+make packages
+sh build_scripts/initrd/mkinittools.sh
+cp -dpf /sources/cloudinstall /bin
+make initrd
+make image

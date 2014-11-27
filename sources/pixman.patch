@@ -1,0 +1,13 @@
+diff -urN pixman.old/configure.ac pixman/configure.ac
+--- pixman.old/configure.ac	2014-06-10 10:25:04.000000000 +0530
++++ pixman/configure.ac	2014-06-10 10:26:31.000000000 +0530
+@@ -64,7 +64,8 @@
+ # Suppress verbose compile lines
+ m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+ 
+-AM_CONFIG_HEADER(config.h)
++#AM_CONFIG_HEADER(config.h)
++AC_CONFIG_HEADERS(config.h)
+ 
+ AC_CANONICAL_HOST
+ 

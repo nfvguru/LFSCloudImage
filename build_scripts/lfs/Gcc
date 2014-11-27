@@ -1,0 +1,75 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -jxf gcc-4.7.2.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar gcc-4.7.2.tar.bz2"
+cd gcc-4.7.2 
+##### Core things
+
+sed -i 's/install_to_$(INSTALL_DEST) //' libiberty/Makefile.in
+sed -i 's/BUILD_INFO=info/BUILD_INFO=/' gcc/configure
+case `uname -m` in
+  i?86) sed -i 's/^T_CFLAGS =$/& -fomit-frame-pointer/' gcc/Makefile.in ;;
+esac
+sed -i -e /autogen/d -e /check.sh/d fixincludes/Makefile.in
+mkdir -v ../gcc-build
+cd ../gcc-build
+
+../gcc-4.7.2/configure --prefix=/usr            \
+                       --libexecdir=/usr/lib    \
+                       --enable-shared          \
+                       --enable-threads=posix   \
+                       --enable-__cxa_atexit    \
+                       --enable-clocale=gnu     \
+                       --enable-languages=c,c++ \
+                       --disable-multilib       \
+                       --disable-bootstrap      \
+                       --with-system-zlib 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure gcc-4.7.2"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make gcc-4.7.2"
+
+ulimit -s 32768
+#MAKE CHECK
+#make -k check
+#../gcc-4.7.2/contrib/test_summary
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install gcc-4.7.2"
+
+ln -sv ../usr/bin/cpp /lib
+ln -sv gcc /usr/bin/cc
+
+# Do some testing
+echo 'main(){}' > dummy.c
+cc dummy.c -v -Wl,--verbose &> dummy.log
+readelf -l a.out | grep ': /lib' 2>&1 >> ${DFILE}
+result=`readelf -l a.out | grep -c ': /lib'`
+if [ $result -eq 0 ];then
+        errorMsg 1 "GLibC Test Failed"
+fi
+grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log 2>&1 >> ${DFILE}
+grep -B4 '^ /usr/include' dummy.log 2>&1 >> ${DFILE}
+grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g'  2>&1 >> ${DFILE}
+grep "/lib.*/libc.so.6 " dummy.log 2>&1 >> ${DFILE}
+grep found dummy.log 2>&1 >> ${DFILE}
+rm -v dummy.c a.out dummy.log 2>&1 >> ${DFILE}
+
+mkdir -pv /usr/share/gdb/auto-load/usr/lib 2>&1 >> ${DFILE}
+mv -v /usr/lib/*gdb.py /usr/share/gdb/auto-load/usr/lib  2>&1 >> ${DFILE}
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf gcc-build 2>&1 >> ${DFILE}
+rm -Rf gcc-4.7.2 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

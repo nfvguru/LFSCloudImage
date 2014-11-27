@@ -1,0 +1,38 @@
+#!/bin/sh
+DFILE=$1
+
+start_time=`date +%s`
+
+mkdir -v $LFS/{dev,proc,sys} 2>&1 >> ${DFILE}
+mknod -m 600 $LFS/dev/console c 5 1 2>&1 >> ${DFILE}
+mknod -m 666 $LFS/dev/null c 1 3 2>&1 >> ${DFILE}
+
+mount -v --bind /dev $LFS/dev 2>&1 >> ${DFILE}
+mount -vt devpts devpts $LFS/dev/pts 2>&1 >> ${DFILE}
+mount -vt proc proc $LFS/proc 2>&1 >> ${DFILE}
+mount -vt sysfs sysfs $LFS/sys 2>&1 >> ${DFILE}
+if [ -h $LFS/dev/shm ]; then
+  link=$(readlink $LFS/dev/shm)
+  mkdir -p $LFS/$link
+  mount -vt tmpfs shm $LFS/$link	 2>&1 >> ${DFILE}
+  unset link
+else
+  mount -vt tmpfs shm $LFS/dev/shm  2>&1 >> ${DFILE}
+fi
+
+cp -dpRvf /home/lfs/config $LFS 2>&1 >> ${DFILE}
+cp -dpRvf /home/lfs/build_scripts $LFS 2>&1 >> ${DFILE}
+cp -dpRvf /home/lfs/Makefile $LFS 2>&1 >> ${DFILE}
+mkdir -pv $LFS/Logs 2>&1 >> ${DFILE}
+
+cat > /home/lfs/chroot << "EOF"
+chroot "$LFS" /tools/bin/env -i \
+    HOME=/root                  \
+    TERM="$TERM"                \
+    PS1='\u:\w\$ '              \
+    PATH=/bin:/usr/bin:/sbin:/usr/sbin:/tools/bin \
+    /tools/bin/bash --login +h
+EOF
+
+end_time=`date +%s`
+echo "==> Completed in `expr $end_time  - $start_time` seconds <=="

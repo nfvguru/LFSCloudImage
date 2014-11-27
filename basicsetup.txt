@@ -1,0 +1,19 @@
+1.  Login
+2.  setup password for root
+        sudo passwd root
+3.  unlock root
+        sudo passwd root -u
+4.  login as root
+        su root
+5.  update the hosts file
+        #echo -e "etc/hosts
+6.  update apt-get
+        apt-get update
+7.  install git
+        apt-get install git
+8.  clone the repo
+	git clone https://github.com/nfvguru/LFSCloudImage
+9. change dir
+        cd LFSCloudImage
+10. build image
+        ./build_lfs.sh

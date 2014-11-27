@@ -1,0 +1,97 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 1 (0x1)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=IN, ST=TN, L=Chennai, O=Calsoftlabs, OU=NFVO, CN=Calsoftlabs CA/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+        Validity
+            Not Before: Jul  1 08:02:58 2014 GMT
+            Not After : Jun 28 08:02:58 2024 GMT
+        Subject: C=IN, ST=TN, L=Chennai, O=Calsoftlabs, OU=NFVO, CN=server/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:bd:66:40:9d:8b:e1:65:b6:20:b5:e4:9f:d1:77:
+                    2f:34:e0:f3:af:94:8e:d8:dd:13:a7:ce:27:5a:6a:
+                    47:d3:d6:f1:ea:c3:4a:7e:ee:af:c9:e7:57:4b:f3:
+                    f7:03:76:9b:c8:1b:39:fa:10:5b:0b:22:eb:be:2b:
+                    68:b7:87:21:73:93:c2:c3:cc:d7:dc:63:44:45:df:
+                    76:6d:0c:71:c1:9f:01:6d:96:af:ff:06:d2:1a:04:
+                    15:bf:4d:05:70:37:e4:f6:af:25:c7:08:82:77:4f:
+                    de:57:8f:9a:ac:ba:ca:fa:58:09:ad:30:16:ad:31:
+                    c1:c6:72:79:77:0c:9d:05:f7:ee:f5:71:b2:cf:b8:
+                    2a:59:a2:61:95:16:99:80:f7:4c:f3:cf:46:69:82:
+                    fb:27:15:c6:f0:51:63:c5:0a:ac:17:5d:4a:ec:c1:
+                    24:1c:36:5c:97:e2:c0:c5:6f:f3:b8:ee:29:54:12:
+                    dd:e3:a6:63:52:6b:b0:77:48:b2:18:00:5c:8b:21:
+                    8c:7f:70:37:de:7f:74:e5:a3:f7:df:ca:9f:50:c0:
+                    a2:d7:a0:30:ed:42:54:66:11:3d:d4:a7:31:b3:d3:
+                    41:12:4e:46:55:df:81:2c:65:14:e8:e8:b4:a2:17:
+                    11:c5:67:39:90:d7:df:42:58:ec:b3:b5:79:08:78:
+                    cc:d3
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                Easy-RSA Generated Server Certificate
+            X509v3 Subject Key Identifier: 
+                B9:CB:4A:EB:8E:DA:BA:45:AD:58:D6:67:2C:36:8C:7F:A8:AB:2D:63
+            X509v3 Authority Key Identifier: 
+                keyid:BB:31:AE:24:80:30:3A:40:53:DB:C3:68:BD:96:E0:89:9F:C7:06:8E
+                DirName:/C=IN/ST=TN/L=Chennai/O=Calsoftlabs/OU=NFVO/CN=Calsoftlabs CA/name=EasyRSA/emailAddress=nfvo@calsoftlabs.com
+                serial:81:B0:A3:63:6C:27:90:6C
+
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha256WithRSAEncryption
+         56:da:7a:65:83:67:b1:3b:b6:0e:d9:2d:26:60:49:0a:37:ff:
+         96:c8:09:79:03:ad:0e:57:96:70:6a:7f:1b:4a:83:6b:28:43:
+         a8:6f:be:cd:58:57:35:86:2a:de:7f:fb:4b:b3:e5:94:6c:0a:
+         63:a3:ea:14:f4:43:b7:7e:6a:47:33:94:ad:3c:2e:d8:1d:ce:
+         6a:be:17:5b:7c:0e:7b:81:ee:e4:d0:69:0c:4f:51:25:9a:14:
+         c8:59:61:05:8c:6d:3c:5c:fc:76:80:3d:75:cd:3a:26:19:1b:
+         e1:4f:59:aa:a0:6b:3b:65:d5:9b:b6:6b:d7:b8:57:7b:ba:46:
+         62:ae:ad:a4:2f:d3:8a:6a:5f:2e:a1:81:f2:e4:8f:04:2c:7c:
+         df:c5:65:77:6f:43:fc:e2:4e:2d:d6:94:14:c0:75:9a:75:ab:
+         f5:26:6d:38:b5:dd:8d:39:ca:b6:d9:25:f5:fe:d8:75:0e:27:
+         77:1f:85:0c:d9:86:33:3e:14:d7:bc:1b:3b:6a:c7:9c:0b:ae:
+         54:9e:06:b6:c0:44:57:6b:bc:62:7f:a2:b9:79:60:98:c9:35:
+         d5:1b:07:ff:8e:f0:7e:c0:ea:70:1f:c1:1b:d9:63:eb:11:82:
+         ef:af:ca:e5:65:76:fa:94:28:73:60:16:23:a1:09:c4:e2:23:
+         9e:4a:4b:7f
+-----BEGIN CERTIFICATE-----
+MIIFKzCCBBOgAwIBAgIBATANBgkqhkiG9w0BAQsFADCBoTELMAkGA1UEBhMCSU4x
+CzAJBgNVBAgTAlROMRAwDgYDVQQHEwdDaGVubmFpMRQwEgYDVQQKEwtDYWxzb2Z0
+bGFiczENMAsGA1UECxMETkZWTzEXMBUGA1UEAxMOQ2Fsc29mdGxhYnMgQ0ExEDAO
+BgNVBCkTB0Vhc3lSU0ExIzAhBgkqhkiG9w0BCQEWFG5mdm9AY2Fsc29mdGxhYnMu
+Y29tMB4XDTE0MDcwMTA4MDI1OFoXDTI0MDYyODA4MDI1OFowgZkxCzAJBgNVBAYT
+AklOMQswCQYDVQQIEwJUTjEQMA4GA1UEBxMHQ2hlbm5haTEUMBIGA1UEChMLQ2Fs
+c29mdGxhYnMxDTALBgNVBAsTBE5GVk8xDzANBgNVBAMTBnNlcnZlcjEQMA4GA1UE
+KRMHRWFzeVJTQTEjMCEGCSqGSIb3DQEJARYUbmZ2b0BjYWxzb2Z0bGFicy5jb20w
+ggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC9ZkCdi+FltiC15J/Rdy80
+4POvlI7Y3ROnzidaakfT1vHqw0p+7q/J51dL8/cDdpvIGzn6EFsLIuu+K2i3hyFz
+k8LDzNfcY0RF33ZtDHHBnwFtlq//BtIaBBW/TQVwN+T2ryXHCIJ3T95Xj5qsusr6
+WAmtMBatMcHGcnl3DJ0F9+71cbLPuCpZomGVFpmA90zzz0ZpgvsnFcbwUWPFCqwX
+XUrswSQcNlyX4sDFb/O47ilUEt3jpmNSa7B3SLIYAFyLIYx/cDfef3Tlo/ffyp9Q
+wKLXoDDtQlRmET3UpzGz00ESTkZV34EsZRTo6LSiFxHFZzmQ199CWOyztXkIeMzT
+AgMBAAGjggFyMIIBbjAJBgNVHRMEAjAAMBEGCWCGSAGG+EIBAQQEAwIGQDA0Bglg
+hkgBhvhCAQ0EJxYlRWFzeS1SU0EgR2VuZXJhdGVkIFNlcnZlciBDZXJ0aWZpY2F0
+ZTAdBgNVHQ4EFgQUuctK647aukWtWNZnLDaMf6irLWMwgdYGA1UdIwSBzjCBy4AU
+uzGuJIAwOkBT28NovZbgiZ/HBo6hgaekgaQwgaExCzAJBgNVBAYTAklOMQswCQYD
+VQQIEwJUTjEQMA4GA1UEBxMHQ2hlbm5haTEUMBIGA1UEChMLQ2Fsc29mdGxhYnMx
+DTALBgNVBAsTBE5GVk8xFzAVBgNVBAMTDkNhbHNvZnRsYWJzIENBMRAwDgYDVQQp
+EwdFYXN5UlNBMSMwIQYJKoZIhvcNAQkBFhRuZnZvQGNhbHNvZnRsYWJzLmNvbYIJ
+AIGwo2NsJ5BsMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDANBgkq
+hkiG9w0BAQsFAAOCAQEAVtp6ZYNnsTu2DtktJmBJCjf/lsgJeQOtDleWcGp/G0qD
+ayhDqG++zVhXNYYq3n/7S7PllGwKY6PqFPRDt35qRzOUrTwu2B3Oar4XW3wOe4Hu
+5NBpDE9RJZoUyFlhBYxtPFz8doA9dc06Jhkb4U9ZqqBrO2XVm7Zr17hXe7pGYq6t
+pC/TimpfLqGB8uSPBCx838Vld29D/OJOLdaUFMB1mnWr9SZtOLXdjTnKttkl9f7Y
+dQ4ndx+FDNmGMz4U17wbO2rHnAuuVJ4GtsBEV2u8Yn+iuXlgmMk11RsH/47wfsDq
+cB/BG9lj6xGC76/K5WV2+pQoc2AWI6EJxOIjnkpLfw==
+-----END CERTIFICATE-----

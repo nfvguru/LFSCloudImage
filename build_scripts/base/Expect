@@ -1,0 +1,38 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -xf expect5.45.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar expect5.45.tar.gz"
+cd expect5.45
+##### Code things
+cp -v configure{,.orig}
+sed 's:/usr/local/bin:/bin:' configure.orig > configure
+
+#Configure
+./configure --prefix=/tools --with-tcl=/tools/lib \
+  --with-tclinclude=/tools/include 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure expect5.45"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make expect5.45"
+
+#ddd Make test
+#make test
+
+make SCRIPTS="" install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install expect5.45"
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf expect5.45 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

@@ -1,0 +1,7 @@
+2010-06-21  Vijay Nayar  <vnayar@clearpathnet.com>
+
+  * Converted project to use the GNU build system.
+
+	* Removed the 'script-security 2 system' option.
+
+	* Changed version to 0.2.

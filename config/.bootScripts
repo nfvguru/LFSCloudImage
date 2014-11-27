@@ -1,0 +1,7 @@
+boot/Network
+boot/Host
+boot/LfsBootScripts
+boot/Inittab
+boot/SetClock
+boot/Console
+boot/Inputrc

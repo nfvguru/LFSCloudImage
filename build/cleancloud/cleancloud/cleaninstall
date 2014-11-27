@@ -1,0 +1,36 @@
+#!/bin/sh
+
+if [ "$1" != "del" ]; then
+	echo nothing to do
+	exit;
+fi 
+rm -dRvf /usr/lib/python2.7/test 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/python2.7/unittest 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/gcc/ 2>&1 >> cleaninstall.log
+rm -dRvf /usr/include 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu-ga 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu-img 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu-io 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu-nbd 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/qemu-system-i386 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gcc 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gcc-ar 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gcc-nm 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gcc-ranlib 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/nasm 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/c++ 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gpg 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/gpgv 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/g++ 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/info 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/cpp 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/grub-fstest 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/automake 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/make 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/grub-mkimage 2>&1 >> cleaninstall.log
+rm -dRvf /usr/bin/grub-mkrelpath 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/gnupg 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/libSDL-1.2.so.0.11.4 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/libparted.so.2.0.0 2>&1 >> cleaninstall.log
+rm -dRvf /usr/lib/perl5/ 2>&1 >> cleaninstall.log

@@ -1,0 +1,52 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=haproxy-1.5.2
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+
+
+#Make
+make TARGET=custom CPU=native USE_PCRE=1 USE_LIBCRYPT=1 USE_LINUX_SPLICE=1 USE_LINUX_TPROXY=1 USE_OPENSSL=1 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+mkdir debian
+
+make DESTDIR=/sources/${basename}/debian SBINDIR=/opt/loadbalancer2.0/ install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+mv debian/opt/loadbalancer2.0/haproxy debian/opt/loadbalancer2.0/loadbalancer
+
+mkdir -pv debian/DEBIAN
+
+cat > debian/DEBIAN/control  << "EOF"
+Package: HA-Proxy
+Version: 1.5.2
+Architecture: i386
+Maintainer: nfvo <nfvo@calsoftlabs.com>
+Description: Customized HA-Proxy package for NFVO
+EOF
+
+find ./debian -type d | xargs chmod 755
+
+export PATH=$PATH:/usr/dpkg/bin:/usr/dpkg/sbin
+dpkg-deb --build debian
+cp debian.deb /build/loadbalancer-1.5.2.deb
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed( /build/${basename}.deb ) in `expr $end_time  - $start_time` seconds <=="

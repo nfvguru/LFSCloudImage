@@ -1,0 +1,39 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=util-linux-2.22.2
+tar -Jxf ${basename}.tar.xz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+sed -i -e 's@etc/adjtime@var/lib/hwclock/adjtime@g' \
+     $(grep -rl '/etc/adjtime' .)
+
+mkdir -pv /var/lib/hwclock  2>&1 >> ${DFILE}
+
+#Configure
+./configure --disable-su --disable-sulogin --disable-login 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

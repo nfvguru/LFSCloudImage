@@ -1,0 +1,12 @@
+mount
+echo
+ls
+ln
+cat
+ps
+dmesg
+sysctl
+switch_root
+mkdir
+clear
+vi

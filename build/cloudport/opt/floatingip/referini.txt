@@ -1,0 +1,15 @@
+[initproperties]
+input_dir=/opt/getposthttprequest/input/
+output_dir=/opt/getposthttprequest/output/
+debug=True
+debug_file=True
+
+[general]
+url=172.24.17.4
+page=cloudbus/whoami
+content={"version":"1.0","name":"at","family":"remote-access","pkgurl":"http://10.1.10.145/vpnrac-0.0.1.deb"}
+content_file=a.txt 2, b.txt 2
+method=POST
+result_console=False
+result_file=True
+

@@ -1,0 +1,44 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=bzip2-1.0.6
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Code things
+patch -Np1 -i ../bzip2-1.0.6-install_docs-1.patch
+sed -i 's@\(ln -s -f \)$(PREFIX)/bin/@\1@' Makefile
+sed -i "s@(PREFIX)/man@(PREFIX)/share/man@g" Makefile
+make -f Makefile-libbz2_so
+make clean
+ 
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make tests
+
+make PREFIX=/usr install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+cp -v bzip2-shared /bin/bzip2 2>&1 >> ${DFILE}
+cp -av libbz2.so* /lib 2>&1 >> ${DFILE}
+ln -sv ../../lib/libbz2.so.1.0 /usr/lib/libbz2.so 2>&1 >> ${DFILE}
+rm -v /usr/bin/{bunzip2,bzcat,bzip2} 2>&1 >> ${DFILE}
+ln -sv bzip2 /bin/bunzip2 2>&1 >> ${DFILE}
+ln -sv bzip2 /bin/bzcat 2>&1 >> ${DFILE}
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

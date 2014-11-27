@@ -1,0 +1,38 @@
+#!/bin/sh
+
+if [ "$1" != "" ]; then
+	SRC=$1
+else
+	SRC=fulllist
+fi
+CONFIG=/config/.dellist
+
+addRm () {
+rmfile=$1
+echo -e "Confirm: ?: \c"
+read copt
+if [ "$copt" == "n" ]; then
+	echo "not adding"
+ 	return
+fi
+echo "${rmfile}" >> ${CONFIG}
+
+}
+
+mv ${CONFIG} ${CONFIG}.`date +%s`.back
+myhead=1
+lentol=$(wc -l fulllist |cut -d" " -f1)
+while [ $myhead -lt $lentol ]; 
+do
+	delfile=$(head -${myhead} ${SRC} | tail -1)
+	#whatis $delfile
+	echo -e "Remove  $delfile ? (x/n)  :\c"
+	read opt
+	if [ "$opt" == "x" ]; then
+		addRm $delfile
+	elif [ "$opt" == "u" ]; then
+	    myhead=$(($myhead - 1))
+	    continue;
+	fi
+	    myhead=$(($myhead + 1))
+done

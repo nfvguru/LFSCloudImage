@@ -1,0 +1,52 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -jxf binutils-2.23.1.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar binutils-2.23.1.tar.bz2"
+cd binutils-2.23.1
+##### Code things
+
+#Check TTY
+result=`expect -c "spawn ls" | grep -c spawn`
+if [ $result -eq 0 ]; then
+	errorMsg 1 "TTYs are NOT Working properly"
+fi
+rm -fv etc/standards.info 2>&1 >> ${DFILE}
+sed -i.bak '/^INFO/s/standards.info //' etc/Makefile.in
+
+#Patch
+patch -Np1 -i ../binutils-2.23.1-testsuite_fix-1.patch
+
+mkdir -v ../binutils-build 2>&1 >> ${DFILE}
+cd ../binutils-build
+
+#Configure
+../binutils-2.23.1/configure --prefix=/usr --enable-shared  2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure binutils-2.23.1"
+
+#Make
+make tooldir=/usr 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make binutils-2.23.1"
+
+# MAKE CHECK
+#make check
+
+make tooldir=/usr install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install binutils-2.23.1"
+
+cp -v ../binutils-2.23.1/include/libiberty.h /usr/include  2>&1 >> ${DFILE}
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf binutils-build 2>&1 >> ${DFILE}
+rm -Rf binutils-2.23.1 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

@@ -1,0 +1,74 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=openvpn-2.3.4
+tar -Jxf ${basename}.tar.xz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+
+#Configure
+./configure --prefix=/opt 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+mkdir debian
+
+make DESTDIR=/sources/${basename}/debian install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+#cleanup docs, man, headers
+rm -Rf debian/opt/share 
+rm -Rf debian/opt/include
+
+#Generate Keys // BUG IN THE CODE
+#tar xvfz ../easy-rsa-release-2.x.tar.gz
+#cd easy-rsa-release-2.x
+#patch -p0  < ../../easy-rsa-release-2.x.patch
+#cd easy-rsa/2.0/
+#source ./vars
+#./clean-all
+#echo -e "\n\n\n\n\n\n\n\n" | ./build-ca
+#echo -e "\n\n\n\n\n\n\n\nnfvo\n\ny\ny\n" | ./build-key-server server
+#WORKAROUND
+mkdir -p  debian/opt/openvpn2.3.4
+cp -dpRf  debian/opt/sbin/* debian/opt/openvpn2.3.4
+rm -Rf debian/opt/sbin
+tar xfz /sources/vpn.tar.gz
+cp -dpRf  vpn/* debian/opt/openvpn2.3.4
+
+
+mkdir debian/DEBIAN
+
+cat > debian/DEBIAN/control  << "EOF"
+Package: openvpn
+Version: 2.3.4
+Architecture: i386
+Maintainer: nfvo <nfvo@calsoftlabs.com>
+Description: Customized openvpn package for NFVO
+EOF
+
+find ./debian -type d | xargs chmod 755
+
+export PATH=$PATH:/usr/dpkg/bin:/usr/dpkg/sbin
+dpkg-deb --build debian
+cp debian.deb /build/${basename}.deb
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed( /build/${basename}.deb ) in `expr $end_time  - $start_time` seconds <=="

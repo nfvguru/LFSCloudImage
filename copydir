@@ -1,0 +1,9 @@
+#!/bin/sh
+dirname=$2
+List=$1
+
+for file in `ls $dirname`;
+do
+	#echo "file=$file"
+	./copybin ${List} ${dirname}/${file}
+done

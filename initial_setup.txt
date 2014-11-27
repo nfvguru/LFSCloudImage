@@ -1,0 +1,56 @@
+sudo apt-get install git
+sudo apt-get install make
+sudo apt-get install bison
+sudo apt-get install gcc
+sudo apt-get install g++
+sudo apt-get install texinfo
+# Sample FDISK given below. Use with care !!
+echo -e "n\np\n\n\n+20G\na\n3\nn\np\n\n\nw\n" | sudo fdisk /dev/sda
+mke2fs -jv /dev/sda3
+export LFS=/mnt/lfs
+sudo mkdir -pv $LFS
+sudo mount -v -t ext3 /dev/sda3 $LFS
+sudo mkdir -v $LFS/sources
+sudo chmod -v a+wt $LFS/sources
+#wget http://www.linuxfromscratch.org/lfs/view/7.3/wget-list
+#mkdir sources
+#wget -i wget-list -P sources
+sudo cp -dpRvf sources $LFS
+#Run all other commands as root
+mkdir -v $LFS/tools
+ln -sv $LFS/tools /
+groupadd lfs
+useradd -s /bin/bash -g lfs -m -k /dev/null lfs
+passwd lfs
+chown -v lfs $LFS/tools
+chown -v lfs $LFS/sources
+cp -Rvf build_scripts Makefile Logs /home/lfs/
+chown -vR lfs /home/lfs
+su - lfs
+
+cat > ~/.bash_profile << "EOF"
+exec env -i HOME=$HOME TERM=$TERM PS1='\u:\w\$ ' /bin/bash
+EOF
+
+
+cat > ~/.bashrc << "EOF"
+set +h
+umask 022
+LFS=/mnt/lfs
+LC_ALL=POSIX
+LFS_TGT=$(uname -m)-lfs-linux-gnu
+PATH=/tools/bin:/bin:/usr/bin
+export LFS LC_ALL LFS_TGT PATH
+EOF
+
+make basetoolchain
+strip --strip-debug /tools/lib/*
+strip --strip-unneeded /tools/{,s}bin/*
+rm -rf /tools/{,share}/{info,man,doc}
+su
+chown -R root:root $LFS/tools
+sh /home/lfs/build_scripts/lfs/Initial
+.chroot
+make lfstoolchain
+logout
+

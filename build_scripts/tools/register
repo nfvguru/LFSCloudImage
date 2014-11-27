@@ -1,0 +1,61 @@
+#!/bin/sh 
+############################
+# GLOBAL
+REG_LOCK="/var/lib/registered"
+REG_LOG="/var/log/register.log"
+REG_URL="/opt/registerurl"
+REG_TXT="/opt/registertext"
+REG_RES="/var/log/response"
+retval=0
+cmdStr=""
+
+## Curl Query 
+######################
+formQuery()
+{
+    cmdStr="curl --output ${REG_RES} -H \"Content-Type: application/json\" --data '$( cat $REG_TXT )' $(cat $REG_URL)"
+}
+
+## Register Function
+######################
+doRegister ()
+{
+    if [  -f $REG_URL ] &&
+        [  -f $REG_TXT ]; then
+	
+	#Form the Query String
+        formQuery
+
+	#Execute the Command
+        $cmdStr		
+	#echo "$response $( cat $REG_RES )"	>> ${REG_LOG}
+	retval=1
+    fi
+}
+
+
+
+######### Loop to Check ###########
+while [ 1 ];
+do
+    #check to see whether  this is done
+    ###############################
+    if [ -f $REG_LOCK ];
+    then
+        echo "$(date): Already Registered" >> ${REG_LOG}
+        break
+    fi
+
+    sleep 5
+
+    echo "$(date): Trying for Registering..." >> ${REG_LOG}
+    doRegister
+    if [ $retval -eq 1 ]; then
+        echo "Registered...." >> ${REG_LOG}
+        echo "1" > $REG_LOCK
+	break
+    else 
+        echo "not done" >> ${REG_LOG}
+    fi
+done
+###################################

@@ -1,0 +1,32 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=systemd-197
+tar -Jxf ${basename}.tar.xz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+
+tar -xvf ../udev-lfs-197-2.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar udev-lfs-197-2.tar.bz2"
+make -f udev-lfs-197-2/Makefile.lfs 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make Udev"
+make -f udev-lfs-197-2/Makefile.lfs install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install "
+
+build/udevadm hwdb --update 2>&1 >> ${DFILE}
+bash udev-lfs-197-2/init-net-rules.sh  2>&1 >> ${DFILE}
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

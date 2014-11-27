@@ -1,0 +1,3 @@
+#!/bin/sh
+
+sed -i -e 's@PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin@&:/usr/dpkg/bin:/usr/dpkg/sbin@' lava.def

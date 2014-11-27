@@ -1,0 +1,10 @@
+#!/bin/sh
+cd /build
+find ./cloudport -type d | xargs chmod 755
+
+export PATH=$PATH:/usr/dpkg/bin:/usr/dpkg/sbin
+dpkg-deb --build cloudport
+mv cloudport.deb cloudport5.4.deb
+
+cd -
+exit;

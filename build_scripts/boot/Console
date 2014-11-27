@@ -1,0 +1,19 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+start_time=`date +%s`
+cat > /etc/sysconfig/console << "EOF"
+# Begin /etc/sysconfig/console
+
+UNICODE="1"
+KEYMAP="us"
+LEGACY_CHARSET="iso-8859-15"
+
+# End /etc/sysconfig/console
+EOF
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

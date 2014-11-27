@@ -1,0 +1,45 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=readline-6.2
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.gz"
+cd ${basename}
+##### Core things
+sed -i '/MV.*old/d' Makefile.in
+sed -i '/{OLDSUFF}/c:' support/shlib-install
+
+#PATCH
+patch -Np1 -i ../readline-6.2-fixes-1.patch 2>&1 >> ${DFILE}
+
+#Configure
+./configure --prefix=/usr --libdir=/lib	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make SHLIB_LIBS=-lncurses 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+mv -v /lib/lib{readline,history}.a /usr/lib 2>&1 >> ${DFILE}
+rm -v /lib/lib{readline,history}.so 2>&1 >> ${DFILE}
+ln -sfv ../../lib/libreadline.so.6 /usr/lib/libreadline.so 2>&1 >> ${DFILE}
+ln -sfv ../../lib/libhistory.so.6 /usr/lib/libhistory.so 2>&1 >> ${DFILE}
+
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

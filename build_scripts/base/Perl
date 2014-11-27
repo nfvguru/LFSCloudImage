@@ -1,0 +1,35 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=perl-5.16.2
+tar -jxf ${basename}.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.bz2"
+cd ${basename}
+##### Core things
+patch -Np1 -i ../perl-5.16.2-libc-1.patch
+
+#Configure
+sh Configure -des -Dprefix=/tools	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+cp -v perl cpan/podlators/pod2man /tools/bin 2>&1 >> ${DFILE}
+mkdir -pv /tools/lib/perl5/5.16.2 2>&1 >> ${DFILE}
+cp -Rv lib/* /tools/lib/perl5/5.16.2 2>&1 >> ${DFILE}
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

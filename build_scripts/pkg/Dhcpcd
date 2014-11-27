@@ -1,0 +1,53 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=dhcpcd-6.0.5
+tar -jxf ${basename}.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.bz2"
+cd ${basename}
+##### Core things
+sed -i -e '/gets is a/d' lib/stdio.in.h
+#Configure
+./configure --libexecdir=/lib/dhcpcd \
+            --dbdir=/run             \
+            --sysconfdir=/etc	2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make check
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+sed -i "s;/var/lib;/run;g" dhcpcd-hooks/50-dhcpcd-compat &&
+install -v -m 644 dhcpcd-hooks/50-dhcpcd-compat /lib/dhcpcd/dhcpcd-hooks/
+
+tar jxpf ../blfs-bootscripts-20130908.tar.bz2
+cd blfs-bootscripts-20130908
+make install-service-dhcpcd
+
+cat > /etc/sysconfig/ifconfig.eth0 << "EOF"
+ONBOOT="yes"
+IFACE="eth0"
+SERVICE="dhcpcd"
+DHCP_START="-b -q"
+DHCP_STOP="-k"
+EOF
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

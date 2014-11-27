@@ -1,0 +1,20 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+
+mkdir Sysv-rc
+cd Sysv-rc
+ar xv ../sysv-rc_2.86.ds1-38+etchnhalf.1_all.deb
+tar xvf data.tar.gz
+cp -dpRvf ./usr/sbin/update-rc.d /usr/sbin/
+cd ..
+rm -Rf Sysv-rc  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

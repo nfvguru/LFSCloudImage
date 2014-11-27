@@ -1,0 +1,4 @@
+#!/bin/sh
+
+mount -o loop,offset=1048576  nfvo_test.img /mnt/myimg
+

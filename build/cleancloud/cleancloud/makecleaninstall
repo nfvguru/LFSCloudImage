@@ -1,0 +1,25 @@
+#!/bin/sh
+CONFIG=/config/.dellist
+BINNAME=cleaninstall
+LOGFILE=cleaninstall.log
+
+addRm () {
+rmfile=$1
+
+echo "rm -dRvf ${rmfile} 2>&1 >> ${LOGFILE}" >> ${BINNAME}
+
+}
+
+echo "#!/bin/sh" > ${BINNAME}
+echo -e "
+if [ \"\$1\" != \"del\" ]; then
+	echo "nothing to do"
+	exit;
+fi " >> ${BINNAME}
+
+for delfile in $(cat ${CONFIG}) ;
+do
+addRm $delfile
+done
+
+chmod +x  ${BINNAME}

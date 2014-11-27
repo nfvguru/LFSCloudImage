@@ -1,0 +1,163 @@
+#!/bin/bash
+LOGFILE=/cloudinstall.log
+
+# Extra Settings
+#1. for opensshd
+mkdir -p /var/lib/sshd
+#2. Bootscripts
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc0.d/K98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc1.d/K98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc2.d/K98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc3.d/S98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc4.d/S98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc5.d/S98rc.local
+ln -sf  /etc/rc.d/init.d/rc.local /etc/rc.d/rc6.d/K98rc.local
+
+export PYTHONPATH=/opt/setuptools/lib/python2.7/site-packages/
+cd /usr/debs
+tar xfz setuptools-2.1.tar.gz
+cd setuptools-2.1
+python setup.py install --prefix=/opt/setuptools  2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf setuptools-2.1 setuptools-2.1.tar.gz
+
+cd /usr/debs
+tar xfz cloud-init-0.6.3.tar.gz
+cd cloud-init-0.6.3
+patch -p0 < ../cloud-init-0.6.3.patch
+python setup.py install  2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf cloud-init-0.6.3 cloud-init-0.6.3.tar.gz
+cp -dpRf /usr/bin/cloud-init.py /usr/bin/cloud-init
+cp -dpRf /usr/bin/cloud-init-cfg.py /usr/bin/cloud-init-cfg
+#HACK for CI
+useradd syslog
+useradd adm
+useradd ubuntu
+mkdir -p /home/ubuntu
+
+
+cd /usr/debs
+tar xfz cloud-utils_0.25.orig.tar.gz
+cd cloud-init-0.25
+make install
+cd ..
+rm -Rf cloud-init-0.25 cloud-utils_0.25.orig.tar.gz
+
+
+#cd /usr/debs
+#tar xvfz heat-cfntools-1.2.7.tar.gz
+#cd heat-cfntools-1.2.7
+#python setup.py install
+
+
+cd /usr/debs
+tar xfz pip-1.5.6.tar.gz
+cd pip-1.5.6
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf pip-1.5.6 pip-1.5.6.tar.gz
+
+###
+#NEED /dev/urandom for pbr
+mknod -m 644 /dev/random c 1 8
+mknod -m 644 /dev/urandom c 1 9
+chown root:root /dev/random /dev/urandom
+
+cd /usr/debs
+tar xfz pbr-0.5.23.tar.gz
+cd pbr-0.5.23
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf pbr-0.5.23 pbr-0.5.23.tar.gz
+
+
+cd /usr/debs
+tar xfz heat-cfntools-1.2.6.tar.gz
+cd heat-cfntools-1.2.6
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf heat-cfntools-1.2.6 heat-cfntools-1.2.6.tar.gz
+
+
+echo "YAML and other Python Tools for cloud init ====================================>>>>>"  >> ${LOGFILE}
+cd /usr/debs
+tar xfz pyyaml_3.10.orig.tar.gz
+cd PyYAML-3.10
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf PyYAML-3.10 pyyaml_3.10.orig.tar.gz
+
+#cheetah_2.4.4.orig.tar.gz distribute_0.6.24.orig.tar.gz python-oauth_1.0.1.orig.tar.gz unittest2_0.5.1.orig.tar.gz
+#Cheetah-2.4.4
+
+cd /usr/debs
+tar xfz cheetah_2.4.4.orig.tar.gz
+cd Cheetah-2.4.4
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf Cheetah-2.4.4 cheetah_2.4.4.orig.tar.gz
+
+
+cd /usr/debs
+tar xfz distribute_0.6.24.orig.tar.gz
+cd distribute-0.6.24
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf distribute_0.6.24.orig.tar.gz distribute-0.6.24
+
+cd /usr/debs
+tar xfz python-oauth_1.0.1.orig.tar.gz
+cd python-oauth-1.0.1
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf python-oauth-1.0.1 python-oauth_1.0.1.orig.tar.gz
+
+
+cd /usr/debs
+tar xfz configobj_4.7.2+ds.orig.tar.gz
+cd configobj-4.7.2
+python setup.py install 2>&1 >> ${LOGFILE}
+cd ..
+rm -Rf configobj-4.7.2 configobj_4.7.2+ds.orig.tar.gz
+echo "=================================="  >> ${LOGFILE}
+
+#Update the Cloudinit config
+mv /usr/debs/cloud.cfg /etc/cloud/cloud.cfg
+
+
+### Other Tools like Coffee etc
+echo "Installing Coffee and team....."
+cd /usr/lib/node_modules/npm/
+npm install
+npm install -g node-uuid
+npm install -g dirty
+npm install -g coffee-script
+
+
+#### UPSTART ###########################################################
+cd /usr/debs
+tar xfz targetX.tar.gz
+cd targetX
+cp -dpRf etc/* /etc/
+cp -dpRf bin/* /bin/
+cp -dpRf usr/* /usr/
+mkdir -p /sbin/backup
+mv sbin/init sbin/init1 2>&1 >> /dev/null
+for f in $(ls sbin); do mv /sbin/$f /sbin/backup 2>&1 >> /dev/null; done
+cp -dpRf sbin/* /sbin/
+cd ..
+rm -Rf targetX targetX.tar.gz
+
+cat > /etc/init.d/rcS  << "EOF"
+#! /bin/sh
+#
+# rcS
+#
+# Call all S??* scripts in /etc/rcS.d/ in numerical/alphabetical order
+#
+
+exec /etc/init.d/rc S
+EOF
+chmod +x /etc/init.d/rcS
+################################################################################

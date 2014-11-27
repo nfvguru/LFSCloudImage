@@ -1,0 +1,33 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+start_time=`date +%s`
+mv -v /tools/bin/{ld,ld-old} 2>&1 >> ${DFILE}
+mv -v /tools/$(gcc -dumpmachine)/bin/{ld,ld-old} 2>&1 >> ${DFILE}
+mv -v /tools/bin/{ld-new,ld} 2>&1 >> ${DFILE}
+ln -sv /tools/bin/ld /tools/$(gcc -dumpmachine)/bin/ld 2>&1 >> ${DFILE}
+
+gcc -dumpspecs | sed -e 's@/tools@@g' \
+    -e '/\*startfile_prefix_spec:/{n;s@.*@/usr/lib/ @}' \
+    -e '/\*cpp:/{n;s@$@ -isystem /usr/include@}' > \
+    `dirname $(gcc --print-libgcc-file-name)`/specs
+
+echo 'main(){}' > dummy.c
+cc dummy.c -v -Wl,--verbose &> dummy.log
+readelf -l a.out | grep ': /lib' 2>&1 >> ${DFILE}
+result=`readelf -l a.out | grep -c ': /lib'`
+if [ $result -eq 0 ];then
+        errorMsg 1 "GLibC Test Failed"
+fi
+grep -o '/usr/lib.*/crt[1in].*succeeded' dummy.log  2>&1 >> ${DFILE}
+grep -B1 '^ /usr/include' dummy.log   2>&1 >> ${DFILE}
+grep 'SEARCH.*/usr/lib' dummy.log |sed 's|; |\n|g' 2>&1 >> ${DFILE}
+grep "/lib.*/libc.so.6 " dummy.log 2>&1 >> ${DFILE}
+grep found dummy.log 2>&1 >> ${DFILE}
+rm -v dummy.c a.out dummy.log  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

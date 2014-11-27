@@ -1,0 +1,62 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -Jxf glibc-2.17.tar.xz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar glibc-2.17.tar.xz"
+cd glibc-2.17
+##### Code things
+if [ ! -r /usr/include/rpc/types.h ]; then
+  su -c 'mkdir -p /usr/include/rpc'
+  su -c 'cp -v sunrpc/rpc/*.h /usr/include/rpc' 
+fi
+
+mkdir -v ../glibc-build
+cd ../glibc-build
+
+#Configure
+../glibc-2.17/configure                             \
+      --prefix=/tools                                 \
+      --host=$LFS_TGT                                 \
+      --build=$(../glibc-2.17/scripts/config.guess) \
+      --disable-profile                               \
+      --enable-kernel=2.6.25                          \
+      --with-headers=/tools/include                   \
+      libc_cv_forced_unwind=yes                       \
+      libc_cv_ctors_header=yes                        \
+      libc_cv_c_cleanup=yes 2>&1 >> ${DFILE}
+
+
+errorMsg $? "Failed to Configure glibc-2.17"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make glibc-2.17"
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install glibc-2.17"
+
+
+# Do some testing...
+echo 'main(){}' > dummy.c
+$LFS_TGT-gcc dummy.c
+readelf -l a.out | grep ': /tools'
+result=`readelf -l a.out | grep -c ': /tools'`	
+if [ $result -eq 0 ];then
+	errorMsg 1 "GLibC Test Failed"
+fi
+rm -v dummy.c a.out
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf glibc-build 2>&1 >> ${DFILE}
+rm -Rf glibc-2.17 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

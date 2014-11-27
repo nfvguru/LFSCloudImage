@@ -1,0 +1,58 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+basename=vim-7.3
+tar -jxf ${basename}.tar.bz2 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.bz2"
+cd vim73
+##### Core things
+echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
+
+#Configure
+./configure --prefix=/usr --enable-multibyte 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure ${basename}"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+#MAKE CHECK
+# make test
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+ln -sv vim /usr/bin/vi 2>&1 >> ${DFILE}
+for L in  /usr/share/man/{,*/}man1/vim.1; do
+    ln -sv vim.1 $(dirname $L)/vi.1 2>&1 >> ${DFILE}
+done 
+
+ln -sv ../vim/vim73/doc /usr/share/doc/vim-7.3
+
+
+cat > /etc/vimrc << "EOF"
+" Begin /etc/vimrc
+
+set nocompatible
+set backspace=2
+syntax on
+if (&term == "iterm") || (&term == "putty")
+  set background=dark
+endif
+
+" End /etc/vimrc
+EOF
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf vim73  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

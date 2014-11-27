@@ -1,0 +1,45 @@
+Developer notes:
+---------------
+
+
+SPAWNVPN is a linux process to invoke the openvpn in linux.rac for Clearpath Networks Business Cloud solutions.
+It is designed to run openvpn for linux.rac. Currently the spawnvpn image is added to Ubuntu debian package for linux.rac.
+
+User gets a spawnvpn image and copied to debian package building directroy(linux.rac) which needs to be build with linux RAC.
+
+
+Requirements for Development Environment:
+-----------------------------------------
+Development system should run with gcc(GNU)
+
+
+
+
+Steps to Configure and Build spawnvpn:
+--------------------------------------
+Needs to get spawnvpn check out from github as below
+git clone https://username:password@github.com/clearpath-networks/spawnvpn.git
+move to the spawnvpn directory
+make distclean
+./configure
+make
+we will get the spawnvpn image in the path spawnvpn/src/spawnvpn
+
+
+spawnvpn Image:
+--------------
+The spawnvpn image can build on different architecture 32bit as well 64bit.
+currently we are building with amd64(64bit) and i386(32bit) on different flavours of Ubuntu
+spawnvpn Image must be replaced based on target architecture to the linx.rac directory.
+
+
+
+
+TODO:
+----
+1) Need to add spawnvpn with linux.rac on the firmware build process
+
+
+
+
+

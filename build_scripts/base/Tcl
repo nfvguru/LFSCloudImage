@@ -1,0 +1,39 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+tar -xf tcl8.6.0-src.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar tcl8.6.0-src.tar.gz"
+cd tcl8.6.0
+##### Code things
+
+#Configure
+ cd unix
+./configure --prefix=/tools 2>&1 >> ${DFILE}
+errorMsg $? "Failed to Configure binutils-2.23.1"
+
+#Make
+make 2>&1 >> ${DFILE}
+errorMsg $? "Failed to make binutils-2.23.1"
+
+#Make TEST
+#TZ=UTC make test
+
+make install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install binutils-2.23.1"
+chmod -v u+w /tools/lib/libtcl8.6.so
+make install-private-headers
+ln -sv tclsh8.6 /tools/bin/tclsh
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf tcl8.6.0 2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

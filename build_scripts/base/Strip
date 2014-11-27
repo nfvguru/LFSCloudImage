@@ -1,0 +1,19 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+start_time=`date +%s`
+
+strip --strip-debug /tools/lib/*
+sleep 1
+errorMsg $? "Failed to Strip1"
+strip --strip-unneeded /tools/{,s}bin/*
+sleep 1
+errorMsg $? "Failed to Strip2"
+rm -rf /tools/{,share}/{info,man,doc}
+errorMsg $? "Failed to Strip3"
+
+end_time=`date +%s`
+logMsg "==> Completed in `expr $end_time  - $start_time` seconds <=="

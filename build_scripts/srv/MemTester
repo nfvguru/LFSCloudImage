@@ -1,0 +1,49 @@
+#!/bin/sh
+SBase=$1
+SDir=$2
+DFILE=$3
+source ${SBase}/build_utils.sh
+
+#echo "Logfile is $DFILE "
+#UNTAR
+start_time=`date +%s`
+#memtester-4.3.0.tar.gz
+basename=memtester-4.3.0
+tar -xf ${basename}.tar.gz 2>&1 >> ${DFILE}
+errorMsg $? "Failed to untar ${basename}.tar.xz"
+cd ${basename}
+##### Core things
+
+
+#Make
+make  2>&1 >> ${DFILE}
+errorMsg $? "Failed to make ${basename}"
+
+mkdir debian
+
+make INSTALLPATH=/sources/${basename}/debian install 2>&1 >> ${DFILE}
+errorMsg $? "Failed to install ${basename}"
+
+mkdir -pv debian/DEBIAN
+
+cat > debian/DEBIAN/control  << "EOF"
+Package: memtester
+Version: 4.3.0
+Architecture: i386
+Maintainer: nfvo <nfvo@calsoftlabs.com>
+Description: Customized memtester package for NFVO
+EOF
+
+find ./debian -type d | xargs chmod 755
+
+export PATH=$PATH:/usr/dpkg/bin:/usr/dpkg/sbin
+dpkg-deb --build debian
+cp debian.deb /build/${basename}.deb
+
+#back to sources dir
+cd ${SDir} 2>&1 >> ${DFILE}
+#remove folder(s)
+rm -Rf ${basename}  2>&1 >> ${DFILE}
+
+end_time=`date +%s`
+logMsg "==> Completed( /build/${basename}.deb ) in `expr $end_time  - $start_time` seconds <=="

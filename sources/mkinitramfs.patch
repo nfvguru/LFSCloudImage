@@ -1,0 +1,58 @@
+diff -urN orig/sbin/mkinitramfs new/sbin/mkinitramfs
+--- orig/sbin/mkinitramfs	2014-09-26 14:37:13.000000000 +0530
++++ new/sbin/mkinitramfs	2014-09-27 06:22:50.000000000 +0530
+@@ -37,8 +37,8 @@
+ 
+ binfiles="sh cat cp dd killall ls mkdir mknod mount "
+ binfiles="$binfiles umount sed sleep ln rm uname"
+-
+-sbinfiles="udevadm modprobe blkid switch_root"
++usrbinfiles="awk gawk"
++sbinfiles="udevadm modprobe blkid switch_root growpart sfdisk resize2fs e2fsck"
+ 
+ #Optional files and locations
+ for f in mdadm udevd; do
+@@ -54,7 +54,7 @@
+ WDIR=$(mktemp -d /tmp/initrd-work.XXXXXXXXXX)
+ 
+ # Create base directory structure
+-mkdir -p $WDIR/{bin,dev,lib/firmware,run,sbin,sys,proc}
++mkdir -p $WDIR/{bin,dev,lib/firmware,run,sbin,sys,proc,tmp}
+ mkdir -p $WDIR/etc/{modprobe.d,udev/rules.d}
+ touch $WDIR/etc/modprobe.d/modprobe.conf
+ ln -s lib $WDIR/lib64
+@@ -104,6 +104,13 @@
+   copy $f sbin
+ done
+ 
++# Copy /usr/bin files
++for f in $usrbinfiles ; do
++  ldd /usr/bin/$f | sed "s/\t//" | cut -d " " -f1 >> $unsorted
++  copy $f sbin
++done
++
++
+ # Add udevd libraries if not in /sbin
+ if [ -x /lib/udev/udevd ] ; then
+   ldd /lib/udev/udevd | sed "s/\t//" | cut -d " " -f1 >> $unsorted
+diff -urN orig/usr/share/mkinitramfs/init.in new/usr/share/mkinitramfs/init.in
+--- orig/usr/share/mkinitramfs/init.in	2014-09-26 14:49:10.000000000 +0530
++++ new/usr/share/mkinitramfs/init.in	2014-09-26 14:51:04.000000000 +0530
+@@ -44,6 +44,17 @@
+        problem
+    done
+ 
++   echo "I want to try grow boot here.................."
++   sleep 3 
++   echo "device=$device..................before"
++   /sbin/growpart -v --fudge 20480 /dev/vda 1
++   sleep 15
++   /sbin/e2fsck -f -y ${device}
++   sleep 5
++   resize2fs ${device}
++   sleep 5
++   echo "device=...............after"
++
+    if ! mount -n -t "$rootfstype" -o "$rootflags" "$device" /.root ; then
+        no_mount $device
+        cat /proc/partitions
